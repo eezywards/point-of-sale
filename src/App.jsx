@@ -9,8 +9,9 @@ function App() {
   const [account, setAccount] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [buttonText, setButtonText] = useState("Connect");
-  const [data, setData] = useState('No data');
+  const [userAddress, setUserAddress] = useState('No data');
   const [isData, setIsData] = useState(false); // change to false if you want to show the QR reader
+  const [bussinessId, setBussinessId] = useState("1"); //todo get from endpoint
 
   const [total, setTotal] = useState(0);
   const [cart, setCart] = useState([]);
@@ -55,8 +56,6 @@ function App() {
       setCart([...cart, { ...product, quantity: 1 }]);
     } else {
       const newCart = cart.map(item => {
-        console.log(item.name);
-        console.log(product.name);
         if (item.name === product.name) {
           return { ...item, quantity: item.quantity + 1 };
         } else {
@@ -94,6 +93,24 @@ function App() {
     }
   }
 
+  const sendTransaction = async (address, amount) => {
+    const link = "https://eezypos.azurewebsites.net/api/transaction"
+    const data = await fetch(link, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ethAddress: address,
+        amount: amount.toFixed(2),
+        businessId: bussinessId
+    }
+    )
+    });
+    const json = await data.json();
+    console.log(json);
+  }
+
   useEffect(() => {
     if (isConnected) {
       setButtonText(formatAddress(account[0]));
@@ -110,9 +127,6 @@ function App() {
 
   useEffect(() => {
     if (discount > 0) {
-      console.log("Discount: " + discount);
-      console.log("Total: " + total);
-      console.log(total * discount / 100);
       setTotal(total - (total * discount / 100));
     }
   } , [discount]);
@@ -129,7 +143,7 @@ function App() {
             constraints={{ facingMode: "environment" }}
             onResult={(result, error) => {
               if (!!result) {
-                setData(result?.text);
+                setUserAddress(result?.text);
                 setIsData(true);
               }
 
@@ -194,6 +208,7 @@ function App() {
                   <QRCodeSVG value={"https://metamask.app.link/send/0xa395B7B0b0E1109599f8d3B4c1bC4436481378C3@80001?value=" + maticValue} />
                   <p className="checkout-total">Total: ${total.toFixed(2)}</p>
                   <button onClick={() => setHasCoupon(true)}>Add coupon</button>
+                  <button onClick={() => sendTransaction(userAddress, total)}>Send Transaction</button>
                 </div>
               )}
             </div>
