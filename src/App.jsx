@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { QrReader } from 'react-qr-reader';
+import { QRCodeSVG } from 'qrcode.react';
 import { ethers } from "ethers";
 import './App.css';
 
@@ -15,6 +16,10 @@ function App() {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [checkout, setCheckout] = useState(false);
+  const [maticValue, setMaticValue] = useState(0);
+
+  const [discount, setDiscount] = useState(0);
+  const [hasCoupon, setHasCoupon] = useState(false);
 
   const connect = async () => {
     if (window.ethereum) {
@@ -28,6 +33,13 @@ function App() {
         setIsConnected(false);
       }
     }
+  }
+
+  const getValueInMatic = async (value) => {
+    const total = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=mxn");
+    const totalJson = await total.json();
+    const totalValue = totalJson["matic-network"]["mxn"];
+    setMaticValue(value / totalValue * 1e18);
   }
 
   const getProducts = async () => {
@@ -92,12 +104,25 @@ function App() {
     getProducts();
   }, []);
 
+  useEffect(() => {
+    getValueInMatic(total);
+  }, [total]);
+
+  useEffect(() => {
+    if (discount > 0) {
+      console.log("Discount: " + discount);
+      console.log("Total: " + total);
+      console.log(total * discount / 100);
+      setTotal(total - (total * discount / 100));
+    }
+  } , [discount]);
+
   return (
     <div className="App">
       <button onClick={connect}>{buttonText}</button>
-      <div className="scan">
-        <h2 className="scan-title">Scan user QR Code</h2>
-        {!isData ? (
+      {!isData ? (
+        <div className="scan">
+          <h2 className="scan-title">Scan user QR Code</h2>
           <QrReader
             delay={300}
             style={{ width: "100%" }}
@@ -113,44 +138,68 @@ function App() {
               }
             }}
           />
-        ) : (
-          <>
-            { !checkout ? (
-              <div className="product-selection">
-                <h2 className="product-selection-title">Product Selection</h2>
-                {products.map(product => (
-                  <div className="product-selection-item" key={product.name}>
-                    <p className="product-selection-item-name">{product.name}</p>
-                    <p className="product-selection-item-price">{product.price}</p>
-                    <button onClick={() => addToCart(product)}>Add to Cart</button>
+        </div>
+      ) : (
+        <>
+          {!checkout ? (
+            <div className="product-selection">
+              <h2 className="product-selection-title">Product Selection</h2>
+              {products.map(product => (
+                <div className="product-selection-item" key={product.name}>
+                  <p className="product-selection-item-name">{product.name}</p>
+                  <p className="product-selection-item-price">{product.price}</p>
+                  <button onClick={() => addToCart(product)}>Add to Cart</button>
+                </div>
+              ))}
+              <div className="cart">
+                <h2 className="cart-title">Cart</h2>
+                {cart.map(item => (
+                  <div className="cart-item" key={item.product}>
+                    <p className="cart-item-name">{item.name}</p>
+                    {item.quantity > 0 ? (
+                      <button onClick={() => removeFromCart(item)}>Remove from Cart</button>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 ))}
-                <div className="cart">
-                  <h2 className="cart-title">Cart</h2>
-                  {cart.map(item => (
-                    <div className="cart-item" key={item.product}>
-                      <p className="cart-item-name">{item.name}</p>
-                      {item.quantity > 0 ? (
-                        <button onClick={() => removeFromCart(item)}>Remove from Cart</button>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  ))}
-                  <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                <p className="cart-total">Total: ${total.toFixed(2)}</p>
+              </div>
+              <button onClick={() => setCheckout(true)}>Checkout</button>
+            </div>
+          ) : (
+            <div className="checkout">
+              {hasCoupon ? ( // TODO: validate coupon ownership
+                <div className="scan">
+                  <h2 className="scan-title">Scan coupon code</h2>
+                  <QrReader
+                    delay={300}
+                    style={{ width: "100%" }}
+                    constraints={{ facingMode: "environment" }}
+                    onResult={(result, error) => {
+                      if (!!result) {
+                        setDiscount(result?.text.slice(0, 2));
+                        console.log(discount);
+                        setHasCoupon(false);
+                      }
+                      if (!!error) {
+                        console.info(error);
+                      }
+                    }}
+                  />
                 </div>
-                <button onClick={() => setCheckout(true)}>Checkout</button>
-              </div>
-            ) : (
-              <div className="checkout">
-                <h2 className="checkout-title">Checkout</h2>
-                <p className="checkout-address">{data}</p>
-                <p className="checkout-total">Total: ${total.toFixed(2)}</p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+              ) : (
+                <div className="final">
+                  <h2 className="checkout-title">Checkout</h2>
+                  <QRCodeSVG value={"https://metamask.app.link/send/0xa395B7B0b0E1109599f8d3B4c1bC4436481378C3@80001?value=" + maticValue} />
+                  <p className="checkout-total">Total: ${total.toFixed(2)}</p>
+                  <button onClick={() => setHasCoupon(true)}>Add coupon</button>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
