@@ -9,7 +9,12 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [buttonText, setButtonText] = useState("Connect");
   const [data, setData] = useState('No data');
-  const [isData, setIsData] = useState(false);
+  const [isData, setIsData] = useState(false); // change to false if you want to show the QR reader
+
+  const [total, setTotal] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [checkout, setCheckout] = useState(false);
 
   const connect = async () => {
     if (window.ethereum) {
@@ -23,6 +28,50 @@ function App() {
         setIsConnected(false);
       }
     }
+  }
+
+  const getProducts = async () => {
+    const data = await fetch("https://eezypos.azurewebsites.net/api/GetProducts");
+    const products = await data.json();
+    console.log(products.products);
+    setProducts(products.products);
+  }
+
+
+  const addToCart = async (product) => {
+    if (!cart.find(item => item.name === product.name)) {
+      setCart([...cart, { ...product, quantity: 1 }]);
+    } else {
+      const newCart = cart.map(item => {
+        console.log(item.name);
+        console.log(product.name);
+        if (item.name === product.name) {
+          return { ...item, quantity: item.quantity + 1 };
+        } else {
+          return item;
+        }
+      }
+      );
+      setCart(newCart);
+    }
+    setTotal(total + parseFloat(product.price));
+  }
+
+  const removeFromCart = async (product) => {
+    setCart(cart.map(item => {
+      if (item.name === product.name) {
+        if (item.quantity > 1) {
+          return { ...item, quantity: item.quantity - 1 };
+        } else {
+          return cart.filter(item => item.name !== product.name);
+        }
+      } else {
+        return item;
+      }
+    }
+    ));
+
+    setTotal(total - product.price);
   }
 
   const formatAddress = (address) => {
@@ -39,37 +88,69 @@ function App() {
     }
   }, [isConnected]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     setIsData(true);
-  //   }
-  // } , [data]);
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <div className="App">
       <button onClick={connect}>{buttonText}</button>
-        <div className="scan">
-          <h2 className="scan-title">Scan user QR Code</h2>
-          {!isData ? (
-            <QrReader
-              delay={300}
-              style={{ width: "100%" }}
-              constraints={{ facingMode: "environment" }}
-              onResult={(result, error) => {
-                if (!!result) {
-                  setData(result?.text);
-                  setIsData(true);
-                }
-      
-                if (!!error) {
-                  console.info(error);
-                }
-              }}
-              />
-          ) : (
-            <p>{data}</p>
-          )}
-        </div>
+      <div className="scan">
+        <h2 className="scan-title">Scan user QR Code</h2>
+        {!isData ? (
+          <QrReader
+            delay={300}
+            style={{ width: "100%" }}
+            constraints={{ facingMode: "environment" }}
+            onResult={(result, error) => {
+              if (!!result) {
+                setData(result?.text);
+                setIsData(true);
+              }
+
+              if (!!error) {
+                console.info(error);
+              }
+            }}
+          />
+        ) : (
+          <>
+            { !checkout ? (
+              <div className="product-selection">
+                <h2 className="product-selection-title">Product Selection</h2>
+                {products.map(product => (
+                  <div className="product-selection-item" key={product.name}>
+                    <p className="product-selection-item-name">{product.name}</p>
+                    <p className="product-selection-item-price">{product.price}</p>
+                    <button onClick={() => addToCart(product)}>Add to Cart</button>
+                  </div>
+                ))}
+                <div className="cart">
+                  <h2 className="cart-title">Cart</h2>
+                  {cart.map(item => (
+                    <div className="cart-item" key={item.product}>
+                      <p className="cart-item-name">{item.name}</p>
+                      {item.quantity > 0 ? (
+                        <button onClick={() => removeFromCart(item)}>Remove from Cart</button>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  ))}
+                  <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                </div>
+                <button onClick={() => setCheckout(true)}>Checkout</button>
+              </div>
+            ) : (
+              <div className="checkout">
+                <h2 className="checkout-title">Checkout</h2>
+                <p className="checkout-address">{data}</p>
+                <p className="checkout-total">Total: ${total.toFixed(2)}</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
