@@ -3,6 +3,7 @@ import { QrReader } from 'react-qr-reader';
 import { QRCodeSVG } from 'qrcode.react';
 import { ethers } from "ethers";
 import './App.css';
+import { height } from "@mui/system";
 
 function App() {
 
@@ -10,7 +11,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [buttonText, setButtonText] = useState("Connect");
   const [userAddress, setUserAddress] = useState('No data');
-  const [isData, setIsData] = useState(false); // change to false if you want to show the QR reader
+  const [isData, setIsData] = useState(true); // change to false if you want to show the QR reader
   const [bussinessId, setBussinessId] = useState("1"); //todo get from endpoint
 
   const [total, setTotal] = useState(0);
@@ -21,6 +22,7 @@ function App() {
 
   const [discount, setDiscount] = useState(0);
   const [hasCoupon, setHasCoupon] = useState(false);
+
 
   const connect = async () => {
     if (window.ethereum) {
@@ -66,6 +68,11 @@ function App() {
       setCart(newCart);
     }
     setTotal(total + parseFloat(product.price));
+  }
+
+  const removeExtraCarts = () => {
+    
+    document.getElementsByTagName("cart")
   }
 
   const removeFromCart = async (product) => {
@@ -131,15 +138,38 @@ function App() {
     }
   } , [discount]);
 
+  const popUp = () => {}
+
   return (
-    <div className="App">
-      <button onClick={connect}>{buttonText}</button>
+    <div className="App point-of-sale">
+      {/* <div className="container-fluid">
+        <div className="row">
+          <div className="col-9 ls">
+            <div className="container">
+            <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
+            <br></br>
+              Products
+              <div className="l-box">
+
+              </div>
+            </div>
+
+          </div>
+          <div className="col-3 rs">
+            s
+          </div>
+        </div>
+      </div> */}
+
+
+      
       {!isData ? (
         <div className="scan">
-          <h2 className="scan-title">Scan user QR Code</h2>
+          <div className="scan-title">Scan QR Code</div>
+          <div className="qrsection">
           <QrReader
             delay={300}
-            style={{ width: "100%" }}
+            style={{ width: "100%"}}
             constraints={{ facingMode: "environment" }}
             onResult={(result, error) => {
               if (!!result) {
@@ -151,12 +181,70 @@ function App() {
                 console.info(error);
               }
             }}
-          />
+          /></div>
         </div>
       ) : (
         <>
           {!checkout ? (
-            <div className="product-selection">
+            <div className="container-fluid">
+              <div className="product-selection row">
+                <div className="col-9 ls">
+                  <div className="container">
+                  <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
+                    <div className="product-selection-title">Products</div>
+
+                    <div className="l-box">
+                    {products.map(product => (
+                      <div class= "row product-row">
+                      <div className="product-selection-item col-sm-6" key={product.name}>
+                        <span className="product-selection-item-name">{product.name+" "}</span><br></br>
+                        <span className="product-selection-item-price">{"$"+product.price}</span>
+                      </div>
+                      <div className="col-sm-6 add-to-cart">
+                        <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button>
+                      </div>
+                      </div>
+                    ))}
+
+                    </div>
+                    
+                  </div>
+
+
+                  
+                </div>
+                
+                <div className="cart col-3 rs">
+                  <div className="container">
+                  <div className="cart-title">Order Summary</div>
+                  {cart.map(item => (
+                    <div className="cart-item cart-flex" key={item.product}>
+                      <div>
+                      <p className="cart-item-name">{item.name}</p>
+                      <p className="cart-item-count">{item.quantity}</p>
+                      </div>
+                      
+                      {item.quantity > 0 ? (
+                        <button class="button type3" onClick={() => removeFromCart(item)}><img className="trash-image" src="img/logo/trash.svg"/></button>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  ))}
+                  <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                  <button  class="button type2" onClick={() => setCheckout(true)}>Checkout</button>
+
+                  </div>
+                  
+                </div>
+
+
+              </div>
+            </div>
+            
+          ) : (
+            <div>
+              <div className="product-selection">
               <h2 className="product-selection-title">Product Selection</h2>
               {products.map(product => (
                 <div className="product-selection-item" key={product.name}>
@@ -171,7 +259,7 @@ function App() {
                   <div className="cart-item" key={item.product}>
                     <p className="cart-item-name">{item.name}</p>
                     {item.quantity > 0 ? (
-                      <button onClick={() => removeFromCart(item)}>Remove from Cart</button>
+                      <button onClick={() => removeFromCart(item)}></button>
                     ) : (
                       <></>
                     )}
@@ -181,14 +269,14 @@ function App() {
               </div>
               <button onClick={() => setCheckout(true)}>Checkout</button>
             </div>
-          ) : (
-            <div className="checkout">
+            <div id="darken" onclick="darken();"></div>
+              <div className="checkout">
               {hasCoupon ? ( // TODO: validate coupon ownership
                 <div className="scan">
                   <h2 className="scan-title">Scan coupon code</h2>
+                  <div className="qrsection">
                   <QrReader
                     delay={300}
-                    style={{ width: "100%" }}
                     constraints={{ facingMode: "environment" }}
                     onResult={(result, error) => {
                       if (!!result) {
@@ -200,7 +288,9 @@ function App() {
                         console.info(error);
                       }
                     }}
+                    videoStyle={{ width: '50vw' }}
                   />
+                  </div>
                 </div>
               ) : (
                 <div className="final">
@@ -211,7 +301,9 @@ function App() {
                   <button onClick={() => sendTransaction(userAddress, total)}>Send Transaction</button>
                 </div>
               )}
+              </div>
             </div>
+            
           )}
         </>
       )}
