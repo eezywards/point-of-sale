@@ -29,14 +29,11 @@
 .App-link {
   color: #61dafb;
 }
-.toplogo{
- text-align: left;
- padding-top: 2rem;
- padding-left: 2rem;
-}
+
 .logoimg{
   height: 30px;
 }
+
 .qrsection{
   text-align: center;
   width: 40%;
@@ -44,6 +41,7 @@
   margin-right: auto;
   padding-bottom: 0rem;
 }
+
 .scan-title{
   font-size: 2rem;
   font-weight: 600;
@@ -58,6 +56,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   padding-bottom: 1rem;
+  text-align: left;
 }
 #footer{
   background-color: #376ADE;
@@ -72,8 +71,6 @@
   to {
     transform: rotate(360deg);
   }
-}
-.product-selection{
 }
 
 .checkout {
@@ -126,6 +123,7 @@
 .product-row{
   padding-top: 1rem;
   padding-bottom: 1rem;
+  margin: 0;
 }
 .product-selection-item-name{
   color: #376ADE;
@@ -133,22 +131,47 @@
 .product-selection-title{
   text-align: left;
 }
-.container{padding-top: 1rem;}
 
 .cart-item-name{
   color: #376ADE;
 }
 .trash-image{
-  height: 32px;
-}
-.prueba{
-  display:flex;
-  justify-content:space-around;
-  border: 1px solid red;
-  align-items: center;
+  height: 20px;
+  filter: invert(35%) sepia(58%) saturate(3530%) hue-rotate(213deg) brightness(93%) contrast(87%);
+  
 }
 
-.prueba:empty {
-  display: none;
+
+.point-of-sale{
+  height: 100vh;
+  background-color: #F0F2F7;
 }
-.p{margin-bottom: 0;}
+.point-of-sale .container-fluid {
+  height: 100%;
+  width: 100%; 
+}
+/* .point-of-sale .container-fluid .row {height: 100%;} */
+.point-of-sale .container-fluid .product-selection { height: 100%; }
+.point-of-sale .container-fluid .product-selection .ls { background-color: #F0F2F7; height: 100%; padding: 0; margin: 0; text-align: left;
+}
+.point-of-sale .container-fluid .product-selection .rs { min-height: 100%; background-color: #fff; padding: 0; margin: 0;}
+.point-of-sale .container-fluid .product-selection .ls .container { height: 100%; }
+.point-of-sale .container-fluid .product-selection .ls .l-box {
+  width: 100%;
+  border-radius: 35px;
+  background-color: #fff;
+  height: calc(100% - 100px);
+  /* height: 100%; */
+}
+
+.point-of-sale .container-fluid .product-selection .ls .l-box .add-to-cart { text-align: right; vertical-align: center; display: flex; align-items: center; justify-content: flex-end;}
+
+.point-of-sale .container-fluid .product-selection .ls .l-box .product-selection-item {
+  padding-right: 10px;
+}
+
+.cart-flex { display: flex; justify-content: space-between;}
+
+.cart .cart-item-count { text-align: left; }
+.cart .cart-item .cart-item-name,.cart-item-count { margin-bottom: 0; }
+.cart-total { text-align: left; }

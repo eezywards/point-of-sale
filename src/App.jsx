@@ -141,10 +141,28 @@ function App() {
   const popUp = () => {}
 
   return (
-    <div className="App">
-      <div className="toplogo">
-      <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
-      </div>
+    <div className="App point-of-sale">
+      {/* <div className="container-fluid">
+        <div className="row">
+          <div className="col-9 ls">
+            <div className="container">
+            <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
+            <br></br>
+              Products
+              <div className="l-box">
+
+              </div>
+            </div>
+
+          </div>
+          <div className="col-3 rs">
+            s
+          </div>
+        </div>
+      </div> */}
+
+
+      
       {!isData ? (
         <div className="scan">
           <div className="scan-title">Scan QR Code</div>
@@ -168,27 +186,39 @@ function App() {
       ) : (
         <>
           {!checkout ? (
-            <div className="container">
+            <div className="container-fluid">
               <div className="product-selection row">
-                <div className="col-7">
-                  <div className="product-selection-title">Products</div>
-                {products.map(product => (
-                  <div class= "row product-row">
-                  <div className="product-selection-item col-sm-6" key={product.name}>
-                    <span className="product-selection-item-name">{product.name+" "}</span><br></br>
-                    <span className="product-selection-item-price">{"$"+product.price}</span></div>
-                    <div className="col-sm-6">
-                    <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button></div>
+                <div className="col-9 ls">
+                  <div className="container">
+                  <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
+                    <div className="product-selection-title">Products</div>
+
+                    <div className="l-box">
+                    {products.map(product => (
+                      <div class= "row product-row">
+                      <div className="product-selection-item col-sm-6" key={product.name}>
+                        <span className="product-selection-item-name">{product.name+" "}</span><br></br>
+                        <span className="product-selection-item-price">{"$"+product.price}</span>
+                      </div>
+                      <div className="col-sm-6 add-to-cart">
+                        <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button>
+                      </div>
+                      </div>
+                    ))}
+
+                    </div>
+                    
                   </div>
-              
-                ))}
+
+
+                  
                 </div>
                 
-
-                <div className="cart col-5">
+                <div className="cart col-3 rs">
+                  <div className="container">
                   <div className="cart-title">Order Summary</div>
                   {cart.map(item => (
-                    <div className="cart-item prueba" key={item.product}>
+                    <div className="cart-item cart-flex" key={item.product}>
                       <div>
                       <p className="cart-item-name">{item.name}</p>
                       <p className="cart-item-count">{item.quantity}</p>
@@ -203,7 +233,12 @@ function App() {
                   ))}
                   <p className="cart-total">Total: ${total.toFixed(2)}</p>
                   <button  class="button type2" onClick={() => setCheckout(true)}>Checkout</button>
+
+                  </div>
+                  
                 </div>
+
+
               </div>
             </div>
             
