@@ -11,7 +11,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [buttonText, setButtonText] = useState("Connect");
   const [userAddress, setUserAddress] = useState('No data');
-  const [isData, setIsData] = useState(true); // change to false if you want to show the QR reader
+  const [isData, setIsData] = useState(false); // change to false if you want to show the QR reader
   const [bussinessId, setBussinessId] = useState("1"); //todo get from endpoint
 
   const [total, setTotal] = useState(0);
@@ -68,11 +68,6 @@ function App() {
       setCart(newCart);
     }
     setTotal(total + parseFloat(product.price));
-  }
-
-  const removeExtraCarts = () => {
-    
-    document.getElementsByTagName("cart")
   }
 
   const removeFromCart = async (product) => {
@@ -138,8 +133,6 @@ function App() {
     }
   } , [discount]);
 
-  const popUp = () => {}
-
   return (
     <div className="App point-of-sale">
       {/* <div className="container-fluid">
@@ -164,24 +157,36 @@ function App() {
 
       
       {!isData ? (
-        <div className="scan">
-          <div className="scan-title">Scan QR Code</div>
-          <div className="qrsection">
-          <QrReader
-            delay={300}
-            style={{ width: "100%"}}
-            constraints={{ facingMode: "environment" }}
-            onResult={(result, error) => {
-              if (!!result) {
-                setUserAddress(result?.text);
-                setIsData(true);
-              }
+        <div className="initial-scan">
+          <div className="container pt-4">
+            <img className= "logoimg d-block mb-5" src="img/logo/eezywards-logo.png"/>
+            <div className="title">Scan QR Code</div>
+            <div className="qrsection">
+            <QrReader
+              delay={300}
+              style={{ width: "100%"}}
+              constraints={{ facingMode: "environment" }}
+              onResult={(result, error) => {
+                if (!!result) {
+                  setUserAddress(result?.text);
+                  setIsData(true);
+                }
 
-              if (!!error) {
-                console.info(error);
-              }
-            }}
-          /></div>
+                if (!!error) {
+                  console.info(error);
+                }
+              }}
+            /></div>
+          </div>
+          <div className="foot">
+            <div className="container">
+              <div className="row">
+                <div className="col-12 text-left">
+                  <a href="/">Pizza Planeta</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         <>
@@ -189,91 +194,117 @@ function App() {
             <div className="container-fluid">
               <div className="product-selection row">
                 <div className="col-9 ls">
-                  <div className="container">
-                  <img className= "logoimg" src="img/logo/eezywards-logo.svg"/>
-                    <div className="product-selection-title">Products</div>
-
+                  <div className="container sp">
+                    <img className= "logoimg" src="img/logo/eezywards-logo.png"/>
+                    <p className="product-selection-title">Products</p>
                     <div className="l-box">
-                    {products.map(product => (
-                      <div class= "row product-row">
-                      <div className="product-selection-item col-sm-6" key={product.name}>
-                        <span className="product-selection-item-name">{product.name+" "}</span><br></br>
-                        <span className="product-selection-item-price">{"$"+product.price}</span>
+                      <div className="container">
+                        {products.map(product => (
+                          <div className="row product">
+                            <div className="product-selection-item col-6" key={product.name}>
+                              <p className="name">{product.name+" "}</p>
+                              <p className="price">{"$"+product.price}</p>
+                            </div>
+                            <div className="col-sm-6 add-to-cart">
+                              <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="col-sm-6 add-to-cart">
-                        <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button>
-                      </div>
-                      </div>
-                    ))}
-
                     </div>
-                    
                   </div>
-
-
-                  
                 </div>
-                
                 <div className="cart col-3 rs">
                   <div className="container">
-                  <div className="cart-title">Order Summary</div>
-                  {cart.map(item => (
-                    <div className="cart-item cart-flex" key={item.product}>
-                      <div>
-                      <p className="cart-item-name">{item.name}</p>
-                      <p className="cart-item-count">{item.quantity}</p>
+                    <div className="cart-title">Order Summary</div>
+                    {cart.map(item => (
+                      <div className="cart-item" key={item.product}>
+                        <div>
+                        <p className="cart-item-name">{item.name}</p>
+                        <p className="cart-item-count">{item.quantity}</p>
+                        </div>
+                        
+                        {item.quantity > 0 ? (
+                          <button class="button type3" onClick={() => removeFromCart(item)}><img className="trash-image" src="img/logo/trash.svg"/></button>
+                        ) : (
+                          <></>
+                        )}
                       </div>
-                      
-                      {item.quantity > 0 ? (
-                        <button class="button type3" onClick={() => removeFromCart(item)}><img className="trash-image" src="img/logo/trash.svg"/></button>
-                      ) : (
-                        <></>
-                      )}
+                    ))}
+                    <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                    <button  class="button type2" onClick={() => setCheckout(true)}>Checkout</button>
+                  </div>
+                </div>
+              </div>
+              <div className="foot">
+                <div className="container">
+                  <div className="row">
+                    <div className="col-12 text-left">
+                      <a href="/">Pizza Planeta</a>
                     </div>
-                  ))}
-                  <p className="cart-total">Total: ${total.toFixed(2)}</p>
-                  <button  class="button type2" onClick={() => setCheckout(true)}>Checkout</button>
-
                   </div>
-                  
                 </div>
-
-
               </div>
             </div>
-            
           ) : (
-            <div>
-              <div className="product-selection">
-              <h2 className="product-selection-title">Product Selection</h2>
-              {products.map(product => (
-                <div className="product-selection-item" key={product.name}>
-                  <p className="product-selection-item-name">{product.name}</p>
-                  <p className="product-selection-item-price">{product.price}</p>
-                  <button onClick={() => addToCart(product)}>Add to Cart</button>
-                </div>
-              ))}
-              <div className="cart">
-                <h2 className="cart-title">Cart</h2>
-                {cart.map(item => (
-                  <div className="cart-item" key={item.product}>
-                    <p className="cart-item-name">{item.name}</p>
-                    {item.quantity > 0 ? (
-                      <button onClick={() => removeFromCart(item)}></button>
-                    ) : (
-                      <></>
-                    )}
+            <div className="container-fluid">
+              <div className="product-selection row">
+                <div className="col-9 ls">
+                  <div className="container sp">
+                    <img className= "logoimg" src="img/logo/eezywards-logo.png"/>
+                    <p className="product-selection-title">Products</p>
+                    <div className="l-box">
+                      <div className="container">
+                        {products.map(product => (
+                          <div className="row product">
+                            <div className="product-selection-item col-6" key={product.name}>
+                              <p className="name">{product.name+" "}</p>
+                              <p className="price">{"$"+product.price}</p>
+                            </div>
+                            <div className="col-sm-6 add-to-cart">
+                              <button class="button type1" onClick={() => addToCart(product)}>Add to Cart</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                ))}
-                <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                </div>
+                <div className="cart col-3 rs">
+                  <div className="container">
+                    <div className="cart-title">Order Summary</div>
+                    {cart.map(item => (
+                      <div className="cart-item" key={item.product}>
+                        <div>
+                        <p className="cart-item-name">{item.name}</p>
+                        <p className="cart-item-count">{item.quantity}</p>
+                        </div>
+                        
+                        {item.quantity > 0 ? (
+                          <button class="button type3" onClick={() => removeFromCart(item)}><img className="trash-image" src="img/logo/trash.svg"/></button>
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                    ))}
+                    <p className="cart-total">Total: ${total.toFixed(2)}</p>
+                    <button  class="button type2" onClick={() => setCheckout(true)}>Checkout</button>
+                  </div>
+                </div>
               </div>
-              <button onClick={() => setCheckout(true)}>Checkout</button>
-            </div>
-            <div id="darken" onclick="darken();"></div>
+              <div className="foot">
+                <div className="container">
+                  <div className="row">
+                    <div className="col-12 text-left">
+                      <a href="/">Pizza Planeta</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="checkout">
-              {hasCoupon ? ( // TODO: validate coupon ownership
+                {hasCoupon ? ( // TODO: validate coupon ownership
                 <div className="scan">
-                  <h2 className="scan-title">Scan coupon code</h2>
+                  <h2 className="title">Scan coupon</h2>
                   <div className="qrsection">
                   <QrReader
                     delay={300}
@@ -292,15 +323,15 @@ function App() {
                   />
                   </div>
                 </div>
-              ) : (
-                <div className="final">
-                  <h2 className="checkout-title">Checkout</h2>
-                  <QRCodeSVG value={"https://metamask.app.link/send/0xa395B7B0b0E1109599f8d3B4c1bC4436481378C3@80001?value=" + maticValue} />
-                  <p className="checkout-total">Total: ${total.toFixed(2)}</p>
-                  <button onClick={() => setHasCoupon(true)}>Add coupon</button>
-                  <button onClick={() => sendTransaction(userAddress, total)}>Send Transaction</button>
-                </div>
-              )}
+                ) : (
+                  <div className="final">
+                    <h2 className="checkout-title">Checkout</h2>
+                    <QRCodeSVG value={"https://metamask.app.link/send/0xa395B7B0b0E1109599f8d3B4c1bC4436481378C3@80001?value=" + maticValue} />
+                    <p className="checkout-total">Total: ${total.toFixed(2)}</p>
+                    <button onClick={() => setHasCoupon(true)}>Add coupon</button>
+                    <button onClick={() => sendTransaction(userAddress, total)}>Confirm purchase</button>
+                  </div>
+                )}
               </div>
             </div>
             
