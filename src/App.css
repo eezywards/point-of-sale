@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 .App {
   text-align: center;
 }
@@ -27,6 +29,41 @@
 .App-link {
   color: #61dafb;
 }
+.toplogo{
+ text-align: left;
+ padding-top: 2rem;
+ padding-left: 2rem;
+}
+.logoimg{
+  height: 30px;
+}
+.qrsection{
+  text-align: center;
+  width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 0rem;
+}
+.scan-title{
+  font-size: 2rem;
+  font-weight: 600;
+  padding-bottom: 1rem;
+}
+.product-selection-title{
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding-bottom: 1rem;
+}
+.cart-title{
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding-bottom: 1rem;
+}
+#footer{
+  background-color: #376ADE;
+  height: 70px;
+}
+#video{height: unset!important;}
 
 @keyframes App-logo-spin {
   from {
@@ -36,3 +73,82 @@
     transform: rotate(360deg);
   }
 }
+.product-selection{
+}
+
+.checkout {
+  background-color: white;
+  position: fixed;
+  z-index: 3;
+  top: 17%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid red;
+  width: 80%;
+}
+#darken {
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: none;
+  opacity: 35%;
+}
+.button{
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 20px;
+  background-color: #376ADE;
+  color: white;
+  border: none;
+}
+.type1{
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.type2{
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+.type3{
+  background-color: white;
+  padding-left: 0rem;
+  padding-right: 0rem;
+}
+
+.product-row{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.product-selection-item-name{
+  color: #376ADE;
+}
+.product-selection-title{
+  text-align: left;
+}
+.container{padding-top: 1rem;}
+
+.cart-item-name{
+  color: #376ADE;
+}
+.trash-image{
+  height: 32px;
+}
+.prueba{
+  display:flex;
+  justify-content:space-around;
+  border: 1px solid red;
+  align-items: center;
+}
+
+.prueba:empty {
+  display: none;
+}
+.p{margin-bottom: 0;}
